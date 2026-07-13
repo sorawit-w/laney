@@ -1,0 +1,10 @@
+# IDE state
+.idea/
+
+# kerby project-state pin (machine-local) — written by `kerby install`
+.kerby/rulebooks.lock
+
+# laney project-state pin (machine-local) — written by `laney install`
+# NOTE: in this source repo a committed pin would also be wrong for a second
+# reason — install-root == workspace, the same trap kerby documents.
+.laney/workflows.lock

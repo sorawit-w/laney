@@ -1,0 +1,28 @@
+{
+  "name": "laney",
+  "description": "laney — a pluggable workflow engine for AI-assisted work. Load a workflow (roles, ordered phases, file handoffs, a mechanical judge), then let laney keep its finger on the current step: it runs each phase with whatever tool the workflow names, records every step's output as plain files in a run folder, judges with real commands, and stops after too many fix loops. The engine ships no workflows and has no opinion about which AI tools you use — workflows carry all of that.",
+  "version": "0.1.0",
+  "author": {
+    "name": "sorawit-w",
+    "url": "https://github.com/sorawit-w"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/sorawit-w/laney",
+  "repository": "https://github.com/sorawit-w/laney",
+  "keywords": [
+    "laney",
+    "workflow",
+    "orchestration",
+    "agentic",
+    "multi-tool",
+    "handoff",
+    "run-state",
+    "judge",
+    "fix-loop",
+    "harness-engineering",
+    "skill"
+  ],
+  "skills": [
+    "./skills/laney"
+  ]
+}
