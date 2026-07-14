@@ -63,7 +63,7 @@ description = "Files changed, decisions, deferred work, commands to verify."
 id = "review"
 file = "review.md"
 versioned = true
-description = "Architect review: BLOCKER / SHOULD FIX / NIT findings plus acceptance check. One per loop iteration."
+description = "Adversarial architect review: three refutation lenses, then BLOCKER / SHOULD FIX / NIT findings plus acceptance check. One per loop iteration."
 
 [[artifact]]
 id = "fix-plan"
@@ -118,7 +118,7 @@ writes = ["impl-notes"]
 
 [[phase]]
 id = "review"
-title = "Architect reviews"
+title = "Architect reviews (adversarially)"
 owner = "architect"
 body = "phases/review.md"
 reads = ["context", "plan", "acceptance", "impl-notes"]
