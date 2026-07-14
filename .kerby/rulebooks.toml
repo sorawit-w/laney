@@ -1,0 +1,7 @@
+# kerby intent manifest — committed, path-free, trust-inert.
+# Shares this repo's rulebook selection; a fresh clone resolves it at load.
+# Schema: docs/rulebook-contract.md § Intent manifest.
+
+[[rulebook]]
+id = "skill-authoring"
+version = "1.2.0"

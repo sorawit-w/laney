@@ -1,0 +1,21 @@
+# {Phase title}
+
+## Purpose
+
+{One or two sentences: what this phase accomplishes in the run.}
+
+## Instructions
+
+{The steps the owner follows. Write for the owner's mode:
+ - a native phase is read by the AI session performing the work;
+ - an invoke phase is read by an external CLI inside the composed prompt;
+ - a human phase is read by a person — say plainly what to do.}
+
+## Inputs
+
+{What to take from each `reads` artifact, by artifact id.}
+
+## Done means
+
+{For each `writes` artifact: what a good one contains. This is the contract
+the next phase depends on — be concrete.}

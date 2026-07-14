@@ -1,0 +1,53 @@
+# workflow.toml — laney workflow manifest (contract 1)
+# Normative reference: docs/workflow-contract.md in the laney repo.
+# Validate: python3 <install-root>/resources/scripts/validate-workflow.py <this-dir>
+
+id = "{id}"                     # slug: lowercase alphanumeric + single hyphens
+version = "0.1.0"
+contract = 1
+description = "{one line shown in `workflows list`}"
+# body = "OVERVIEW.md"          # optional prose read eagerly at `load`
+
+# ---- roles: named slots phases are owned by. `human` and `judge` are
+# ---- reserved owner names — never declared here.
+[roles.{role-name}]
+mode = "native"                 # native = the loaded AI session does the phase
+description = "{optional}"
+
+# [roles.{other-role}]
+# mode = "invoke"               # invoke = the engine runs a CLI
+# command = "{your tool} {prompt_file}"   # binding string — yours, verbatim.
+#                               # placeholders: {prompt_file}, {run_dir} only
+# capture = "stdout"            # stdout = engine captures output into the
+#                               #   phase's first written artifact
+#                               # files  = the tool writes artifacts into
+#                               #   {run_dir} itself; engine verifies presence
+# timeout_seconds = 600
+
+# ---- artifacts: the handoff files. They live in the run directory.
+[[artifact]]
+id = "{artifact-id}"
+file = "{artifact}.md"          # bare filename — never a path
+# template = "templates/{artifact}.md"   # optional scaffold, copied at phase start
+# versioned = true              # REQUIRED for the judge's evidence and anything
+#                               # written inside the fix loop: materializes as
+#                               # <stem>-<n><ext>; the ordinals are the loop counter
+# description = "{optional}"
+
+# ---- phases: declaration order is execution order.
+[[phase]]
+id = "{phase-id}"
+owner = "{role-name}"           # a declared role, "human", or "judge"
+body = "phases/{phase-id}.md"   # the prose the owner follows (judge: NO body)
+reads = []                      # artifact ids this phase consumes
+writes = ["{artifact-id}"]      # non-empty — artifact presence IS the state;
+                                # even an approval phase writes an approval file
+
+# ---- judge: the mechanical checker. Present iff exactly one phase has
+# ---- owner = "judge". Verdicts come only from real command exit codes.
+# [judge]
+# commands = ["{check-command}"]  # resolved against the consuming repo at run
+#                                 # time — relative names only, never assumed
+# evidence = "{evidence-artifact-id}"   # declared, versioned; in judge's writes
+# max_fix_loops = 3
+# on_fail = "{phase-id}"          # the phase re-entered on a fail; precedes judge

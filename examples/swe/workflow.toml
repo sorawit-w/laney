@@ -1,0 +1,159 @@
+# workflow.toml — laney workflow manifest (contract 1)
+# Normative reference: docs/workflow-contract.md in the laney repo.
+# Validate: python3 <install-root>/resources/scripts/validate-workflow.py <this-dir>
+#
+# Source: ~/Downloads/agentic-dev-workflow.md (the "Claude plans and reviews,
+# Codex implements, Bun-based checks judge, Antigravity spikes" division of
+# labor). Tool bindings live HERE, in workflow-owned data — never in the engine.
+
+id = "swe"
+version = "1.0.0"
+contract = 1
+description = "Software feature loop: Claude architects and reviews natively, Codex implements and fixes via CLI, agy runs a no-edit spike, bun checks judge."
+
+# ---- roles -----------------------------------------------------------------
+
+[roles.architect]
+mode = "native"
+description = "Plans, reviews, and drafts the PR summary in the loaded AI session (Claude)."
+
+[roles.implementer]
+mode = "invoke"
+command = "codex exec -s workspace-write --skip-git-repo-check - < {prompt_file}"
+capture = "files"
+timeout_seconds = 1800
+description = "Codex CLI: main implementer and fixer. Edits the repo, writes its handoff artifacts into the run dir."
+
+[roles.specialist]
+mode = "invoke"
+command = "agy -p \"$(cat {prompt_file})\" --mode plan"
+capture = "stdout"
+timeout_seconds = 600
+description = "Antigravity CLI in plan (no-edit) mode: Google/Gemini/browser/spike lane. Output captured to the spike artifact."
+
+# ---- artifacts -------------------------------------------------------------
+
+[[artifact]]
+id = "context"
+file = "context.md"
+template = "templates/context.md"
+description = "Task context from the product owner: goal, current/desired behavior, constraints, risks, check commands."
+
+[[artifact]]
+id = "plan"
+file = "plan.md"
+description = "Implementation approach, files likely to change, risks, test plan."
+
+[[artifact]]
+id = "acceptance"
+file = "acceptance.md"
+description = "The checklist that defines done."
+
+[[artifact]]
+id = "spike"
+file = "spike.md"
+description = "Specialist lane findings — or an explicit 'skipped: not applicable' record."
+
+[[artifact]]
+id = "impl-notes"
+file = "implementation-notes.md"
+description = "Files changed, decisions, deferred work, commands to verify."
+
+[[artifact]]
+id = "review"
+file = "review.md"
+versioned = true
+description = "Architect review: BLOCKER / SHOULD FIX / NIT findings plus acceptance check. One per loop iteration."
+
+[[artifact]]
+id = "fix-plan"
+file = "fix-plan.md"
+versioned = true
+description = "What was fixed and what remains. One per loop iteration."
+
+[[artifact]]
+id = "test-output"
+file = "test-output.md"
+versioned = true
+description = "Judge evidence: raw output of the check commands. Verdict lives in the filename (.pass/.fail)."
+
+[[artifact]]
+id = "pr-summary"
+file = "pr-summary.md"
+description = "PR-ready summary: what changed, why, testing done, risks/rollback."
+
+# ---- phases (declaration order is execution order) -------------------------
+
+[[phase]]
+id = "capture-context"
+title = "Context capture"
+owner = "human"
+body = "phases/capture-context.md"
+reads = []
+writes = ["context"]
+
+[[phase]]
+id = "plan"
+title = "Architect plans"
+owner = "architect"
+body = "phases/plan.md"
+reads = ["context"]
+writes = ["plan", "acceptance"]
+
+[[phase]]
+id = "spike"
+title = "Specialist spike (no-edit)"
+owner = "specialist"
+body = "phases/spike.md"
+reads = ["context", "plan"]
+writes = ["spike"]
+
+[[phase]]
+id = "implement"
+title = "Implementer codes"
+owner = "implementer"
+body = "phases/implement.md"
+reads = ["context", "plan", "acceptance", "spike"]
+writes = ["impl-notes"]
+
+[[phase]]
+id = "review"
+title = "Architect reviews"
+owner = "architect"
+body = "phases/review.md"
+reads = ["context", "plan", "acceptance", "impl-notes"]
+writes = ["review"]
+
+[[phase]]
+id = "fix"
+title = "Implementer fixes"
+owner = "implementer"
+body = "phases/fix.md"
+reads = ["acceptance", "review"]
+writes = ["fix-plan"]
+
+[[phase]]
+id = "judge"
+title = "Checks judge"
+owner = "judge"
+reads = ["fix-plan"]
+writes = ["test-output"]
+
+[[phase]]
+id = "pr"
+title = "PR summary"
+owner = "architect"
+body = "phases/pr.md"
+reads = ["plan", "acceptance", "impl-notes"]
+writes = ["pr-summary"]
+
+# ---- judge -----------------------------------------------------------------
+# Commands resolve against the CONSUMING repo at run time. `bun run e2e` is
+# deliberately not here: a repo without that script would HELD every run —
+# E2E/smoke for UI-heavy work is a review-body checklist item instead.
+
+[judge]
+commands = ["bun run typecheck", "bun run lint", "bun run test", "bun run build"]
+evidence = "test-output"
+max_fix_loops = 3
+on_fail = "review"
