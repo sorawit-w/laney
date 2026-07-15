@@ -31,17 +31,20 @@ laney next    # steps one phase per invocation
 3. **spike** (specialist, no-edit) → `spike.md` — writes `skipped: not
    applicable` for non-Google/browser tasks
 4. **implement** (implementer) → `implementation-notes.md` + the repo diff
-5. **review** (architect) → `review-<n>.md` ┐
+5. **review** (architect, adversarial) → `review-<n>.md` ┐
 6. **fix** (implementer) → `fix-plan-<n>.md` │ fix loop, max 3 —
 7. **judge** (bun checks) → `test-output-<n>.pass|fail.md` ┘ on fail, re-enter review
 8. **pr** (architect) → `pr-summary.md`
 
 One deliberate rotation from the source doc: contract 1 requires the judge's
 `on_fail` target to precede the judge, so each iteration runs review → fix →
-checks (the doc writes it checks → review → fix). Iteration 1's review is a
-pre-judge code review; from iteration 2 the review also reads the failing
-evidence. `bun run e2e` is not a judge command — a repo without that script
-would hold every run — E2E for UI-heavy work is a review checklist item.
+checks (the doc writes it checks → review → fix). The review is adversarial —
+the architect works three refutation lenses (spec contradiction, runtime
+break, claim verification) and treats the implementer's notes as claims, not
+evidence. Iteration 1's review is a pre-judge refutation pass; from iteration
+2 it also reads the failing evidence. `bun run e2e` is not a judge command —
+a repo without that script would hold every run — E2E for UI-heavy work stays
+a review checklist item.
 
 ## Provenance
 
@@ -49,3 +52,6 @@ Authored 2026-07-13 via `laney workflows create` from
 `~/Downloads/agentic-dev-workflow.md`; bindings confirmed against the locally
 installed `codex` 0.144.1 and `agy` CLIs. The image-generation lane from the
 source doc is out of scope here — it is its own workflow when needed.
+Adversarial review stance (2026-07-14) adapted from `Sahir619/fable-method`
+(MIT) — refutation lenses over neutral review; its orchestration loop itself
+was deliberately not adopted (sequencing is what this workflow already does).
